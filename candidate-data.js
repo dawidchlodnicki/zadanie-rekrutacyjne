@@ -1,9 +1,11 @@
 window.CANDIDATE_VIEW = {
   codeReview: {
-    title: 'PR #812: Zamów ponownie z historii zamówień',
+    label: 'Pull request #812',
+    title: 'Zamów ponownie z historii zamówień',
     instructions: 'Jesteś reviewerem tego PR. Przejrzyj zmiany pod kątem zadania i powiedz na głos, co napisałbyś autorowi: co blokuje merge, co trzeba poprawić, a co jest w porządku. Możesz dopytywać o kontekst.',
     ticket: {
-      title: 'Zadanie: Zamów ponownie',
+      label: 'Zadanie',
+      title: 'Zamów ponownie',
       points: [
         'Klient B2B chce szybko powtórzyć wcześniejsze zamówienie.',
         'Na stronie szczegółów zamówienia w panelu klienta dodajemy przycisk „Zamów ponownie”.',
@@ -224,10 +226,24 @@ window.CANDIDATE_VIEW = {
   },
   systemDesign: {
     title: 'Synchronizacja sklepu z systemem ERP',
-    points: [
-      'ERP (Firebird, REST API z limitem, czasem niedostępne) jest źródłem prawdy dla produktów, cen, stanów i statusów zamówień.',
-      'Sklep: PHP + MySQL, Nuxt z SSR, kilkadziesiąt tysięcy produktów, kilka krajów, cenniki B2B.',
-      'Zaprojektuj przepływ danych w obie strony i powiedz, co się dzieje przy awariach.',
+    systems: [
+      {
+        name: 'ERP',
+        tech: 'Firebird · REST API',
+        facts: [
+          'Źródło prawdy dla produktów, cen, stanów i statusów zamówień.',
+          'API ma limit zapytań i bywa niedostępne.',
+        ],
+      },
+      {
+        name: 'Sklep',
+        tech: 'PHP · MySQL · Nuxt SSR',
+        facts: [
+          'Kilkadziesiąt tysięcy produktów, kilka krajów.',
+          'Klienci B2B mają indywidualne cenniki.',
+        ],
+      },
     ],
+    task: 'Zaprojektuj przepływ danych w obie strony i powiedz, co się dzieje przy awariach.',
   },
 };

@@ -4,27 +4,39 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Inter:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="candidate">
-    <nav><a href="#cr" data-tab="cr">Code review</a><a href="#sd" data-tab="sd">System design</a></nav>
-    <div id="content"></div>
-  </main>
+  <header class="c-top">
+    <span class="c-brand">Zadanie rekrutacyjne</span>
+    <nav class="tabs"><a href="#cr" data-tab="cr">Code review</a><a href="#sd" data-tab="sd">System design</a></nav>
+  </header>
+  <main class="c-main" id="content"></main>
   <script src="candidate-data.js"></script>
   <script src="diff.js"></script>
   <script>
     (function () {
       const { codeReview: cr, systemDesign: sd } = window.CANDIDATE_VIEW;
       const { renderDiff, renderBrief, escapeHtml } = window.DiffView;
+      const system = (s) => `<div class="sys"><div class="sys-name">${escapeHtml(s.name)}</div><div class="sys-tech">${escapeHtml(s.tech)}</div><ul>${s.facts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul></div>`;
+
+      function systemDesign() {
+        return `<div class="sd-head"><div class="eyebrow">System design</div><h1>${escapeHtml(sd.title)}</h1></div>
+          <div class="sd-map">${system(sd.systems[0])}<div class="sd-link"><span>?</span></div>${system(sd.systems[1])}</div>
+          <div class="sd-task"><span class="label">Zadanie</span><p>${escapeHtml(sd.task)}</p></div>`;
+      }
+
       function render() {
         const tab = location.hash === '#sd' ? 'sd' : 'cr';
         document.querySelectorAll('[data-tab]').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
         document.title = tab === 'sd' ? 'System design' : 'Code review';
-        document.getElementById('content').innerHTML = tab === 'sd'
-          ? `<div class="sd"><h1>${escapeHtml(sd.title)}</h1><ul>${sd.points.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul></div>`
-          : `${renderBrief(cr)}${renderDiff(cr.files)}`;
+        document.getElementById('content').innerHTML = tab === 'sd' ? systemDesign() : `${renderBrief(cr)}${renderDiff(cr.files)}`;
+        window.scrollTo(0, 0);
       }
+
       window.addEventListener('hashchange', render);
       render();
     })();
