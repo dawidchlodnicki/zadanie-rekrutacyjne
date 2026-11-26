@@ -21,19 +21,43 @@
     (function () {
       const { codeReview: cr, systemDesign: sd } = window.CANDIDATE_VIEW;
       const { renderDiff, renderBrief, escapeHtml } = window.DiffView;
+      const content = document.getElementById('content');
       const system = (s) => `<div class="sys"><div class="sys-name">${escapeHtml(s.name)}</div><div class="sys-tech">${escapeHtml(s.tech)}</div><ul>${s.facts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul></div>`;
+      let observer;
 
       function systemDesign() {
-        return `<div class="sd-head"><div class="eyebrow">System design</div><h1>${escapeHtml(sd.title)}</h1></div>
+        return `<div class="c-sd"><div class="sd-head"><div class="eyebrow">System design</div><h1>${escapeHtml(sd.title)}</h1></div>
           <div class="sd-map">${system(sd.systems[0])}<div class="sd-link"><span>?</span></div>${system(sd.systems[1])}</div>
-          <div class="sd-task"><span class="label">Zadanie</span><p>${escapeHtml(sd.task)}</p></div>`;
+          <div class="sd-task"><span class="label">Zadanie</span><p>${escapeHtml(sd.task)}</p></div></div>`;
+      }
+
+      function codeReview() {
+        const brief = renderBrief(cr);
+        return `<div class="c-cr">${brief.todo}<aside class="c-side">${brief.ticket}${brief.pr}</aside><div class="c-diff">${renderDiff(cr.files)}</div></div>`;
+      }
+
+      function trackFiles() {
+        const sections = [...content.querySelectorAll('.d-file')];
+        const links = [...content.querySelectorAll('.b-files [data-file]')];
+        const visible = new Set();
+        observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) visible.add(entry.target);
+            else visible.delete(entry.target);
+          }
+          const current = sections.find((x) => visible.has(x));
+          links.forEach((link) => link.classList.toggle('on', current?.id === `file-${link.dataset.file}`));
+        }, { rootMargin: '-72px 0px -55% 0px' });
+        sections.forEach((x) => observer.observe(x));
       }
 
       function render() {
         const tab = location.hash === '#sd' ? 'sd' : 'cr';
+        observer?.disconnect();
         document.querySelectorAll('[data-tab]').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
         document.title = tab === 'sd' ? 'System design' : 'Code review';
-        document.getElementById('content').innerHTML = tab === 'sd' ? systemDesign() : `${renderBrief(cr)}${renderDiff(cr.files)}`;
+        content.innerHTML = tab === 'sd' ? systemDesign() : codeReview();
+        if (tab === 'cr') trackFiles();
         window.scrollTo(0, 0);
       }
 

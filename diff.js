@@ -7,6 +7,7 @@
   const escapeHtml = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const span = (cls, text) => `<span class="tk-${cls}">${escapeHtml(text)}</span>`;
   const addedLines = (file) => file.hunks.reduce((n, h) => n + h.lines.filter((l) => l[0] === '+').length, 0);
+  const fileName = (path) => path.slice(path.lastIndexOf('/') + 1);
 
   function highlight(code, lang) {
     const markup = lang === 'vue' && code.trimStart().startsWith('<');
@@ -56,7 +57,7 @@
       for (const line of hunk.lines) {
         const added = line[0] === '+';
         const marked = byLine.has(index);
-        rows += `<tr class="${added ? 'd-add' : ''}${marked ? ' d-marked' : ''}"${marked ? ` id="line-${byLine.get(index)[0].key}"` : ''}>${markCell(index)}<td class="d-num">${no++}</td><td class="d-sign">${added ? '+' : ''}</td><td class="d-code"><code>${highlight(line.slice(1), file.lang) || ' '}</code></td></tr>`;
+        rows += `<tr class="${added ? 'd-add' : ''}${marked ? ' d-marked' : ''}"${marked ? ` id="line-${byLine.get(index)[0].key}"` : ''}>${markCell(index)}<td class="d-num" data-pick>${no++}</td><td class="d-sign">${added ? '+' : ''}</td><td class="d-code"><code>${highlight(line.slice(1), file.lang) || ' '}</code></td></tr>`;
         index++;
       }
     }
@@ -64,25 +65,26 @@
   }
 
   function renderBrief(cr) {
-    const total = cr.files.reduce((n, f) => n + addedLines(f), 0);
-    return `<section class="brief">
-      <div class="brief-do"><span class="label">Co masz zrobić</span><p>${escapeHtml(cr.instructions)}</p></div>
-      <div class="brief-card"><span class="label">${escapeHtml(cr.ticket.label)}</span><h3>${escapeHtml(cr.ticket.title)}</h3><ul>${cr.ticket.points.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul></div>
-      <div class="brief-card"><span class="label">${escapeHtml(cr.label)}</span><h3>${escapeHtml(cr.title)}</h3><p>${escapeHtml(cr.description)}</p>
-        <div class="brief-meta">${cr.files.length} plików <span class="d-plus">+${total}</span></div>
-        <div class="brief-files">${cr.files.map((f, i) => `<button data-file="${i}">${escapeHtml(f.path.slice(f.path.lastIndexOf('/') + 1))}</button>`).join('')}</div>
-      </div>
-    </section>`;
+    return {
+      todo: `<section class="b-do"><span class="label">Co masz zrobić</span><p>${escapeHtml(cr.instructions)}</p></section>`,
+      ticket: `<section class="b-card"><span class="label">${escapeHtml(cr.ticket.label)}</span><h3>${escapeHtml(cr.ticket.title)}</h3><ol>${cr.ticket.points.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ol></section>`,
+      pr: `<section class="b-card"><span class="label">${escapeHtml(cr.label)}</span><h3>${escapeHtml(cr.title)}</h3><p>${escapeHtml(cr.description)}</p>
+        <nav class="b-files">${cr.files.map((f, i) => `<button data-file="${i}"><span>${escapeHtml(fileName(f.path))}</span><span class="d-plus">+${addedLines(f)}</span></button>`).join('')}</nav>
+      </section>`,
+    };
   }
 
   document.addEventListener('click', (e) => {
-    const el = e.target.closest('[data-file]');
-    if (el) document.getElementById(`file-${el.dataset.file}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const file = e.target.closest('[data-file]');
+    if (file) document.getElementById(`file-${file.dataset.file}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const pick = e.target.closest('[data-pick]');
+    if (pick) pick.parentElement.classList.toggle('d-pick');
   });
 
   window.DiffView = {
     renderDiff: (files, markers = []) => files.map((f, i) => renderFile(f, i, markers)).join(''),
     renderBrief,
     escapeHtml,
+    fileName,
   };
 })();
