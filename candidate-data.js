@@ -226,23 +226,9 @@ window.CANDIDATE_VIEW = {
   },
   systemDesign: {
     title: 'Synchronizacja sklepu z systemem ERP',
-    systems: [
-      {
-        name: 'ERP',
-        tech: 'Firebird · REST API',
-        facts: [
-          'Źródło prawdy dla produktów, cen, stanów i statusów zamówień.',
-          'API ma limit zapytań i bywa niedostępne.',
-        ],
-      },
-      {
-        name: 'Sklep',
-        tech: 'PHP · MySQL · Nuxt SSR',
-        facts: [
-          'Kilkadziesiąt tysięcy produktów, kilka krajów.',
-          'Klienci B2B mają indywidualne cenniki.',
-        ],
-      },
+    description: [
+      'Sklep internetowy (PHP, MySQL, Nuxt SSR) sprzedaje kilkadziesiąt tysięcy produktów w kilku krajach. Klienci B2B mają indywidualne cenniki.',
+      'Produkty, ceny, stany magazynowe i statusy zamówień pochodzą z systemu ERP (Firebird, REST API), który jest dla nich źródłem prawdy. Zamówienia klienci składają w sklepie i każde musi trafić do ERP. API ERP ma limit zapytań i bywa niedostępne.',
     ],
     task: 'Zaprojektuj przepływ danych w obie strony i powiedz, co się dzieje przy awariach.',
   },

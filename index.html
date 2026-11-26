@@ -22,13 +22,12 @@
       const { codeReview: cr, systemDesign: sd } = window.CANDIDATE_VIEW;
       const { renderDiff, renderBrief, escapeHtml } = window.DiffView;
       const content = document.getElementById('content');
-      const system = (s) => `<div class="sys"><div class="sys-name">${escapeHtml(s.name)}</div><div class="sys-tech">${escapeHtml(s.tech)}</div><ul>${s.facts.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul></div>`;
       let observer;
 
       function systemDesign() {
-        return `<div class="c-sd"><div class="sd-head"><div class="eyebrow">System design</div><h1>${escapeHtml(sd.title)}</h1></div>
-          <div class="sd-map">${system(sd.systems[0])}<div class="sd-link"><span>?</span></div>${system(sd.systems[1])}</div>
-          <div class="sd-task"><span class="label">Zadanie</span><p>${escapeHtml(sd.task)}</p></div></div>`;
+        return `<article class="c-sd"><div class="eyebrow">System design</div><h1>${escapeHtml(sd.title)}</h1>
+          ${sd.description.map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
+          <span class="label">Zadanie</span><p class="sd-task">${escapeHtml(sd.task)}</p></article>`;
       }
 
       function codeReview() {
