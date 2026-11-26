@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="candidate">
+    <nav><a href="#cr" data-tab="cr">Code review</a><a href="#sd" data-tab="sd">System design</a></nav>
+    <div id="content"></div>
+  </main>
+  <script src="candidate-data.js"></script>
+  <script src="diff.js"></script>
+  <script>
+    (function () {
+      const { codeReview: cr, systemDesign: sd } = window.CANDIDATE_VIEW;
+      const { renderDiff, renderBrief, escapeHtml } = window.DiffView;
+      function render() {
+        const tab = location.hash === '#sd' ? 'sd' : 'cr';
+        document.querySelectorAll('[data-tab]').forEach((a) => a.classList.toggle('on', a.dataset.tab === tab));
+        document.title = tab === 'sd' ? 'System design' : 'Code review';
+        document.getElementById('content').innerHTML = tab === 'sd'
+          ? `<div class="sd"><h1>${escapeHtml(sd.title)}</h1><ul>${sd.points.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul></div>`
+          : `${renderBrief(cr)}${renderDiff(cr.files)}`;
+      }
+      window.addEventListener('hashchange', render);
+      render();
+    })();
+  </script>
+</body>
+</html>
